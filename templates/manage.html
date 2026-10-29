@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage booking | Birendra Mishra</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-name">Birendra Mishra</span>
+        <span class="logo-tag">Strategic Financial Leadership</span>
+      </a>
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+        <a class="btn btn-primary btn-sm" href="book.html">Book</a>
+      </div>
+    </div>
+  </header>
+  <main class="section">
+    <div class="container narrow">
+      <p class="eyebrow">Bookings</p>
+      <h1>Manage your booking</h1>
+      <p class="lead">Use the secure token from your confirmation email to cancel or request a reschedule.</p>
+      <div id="manage-alert" hidden></div>
+      <form class="card" id="manage-form">
+        <div class="form-grid">
+          <div class="full">
+            <label for="mg-token">Booking token *</label>
+            <input id="mg-token" name="token" required placeholder="Paste token from confirmation email" />
+          </div>
+          <div class="full">
+            <label for="mg-action">Action *</label>
+            <select id="mg-action" name="action" required>
+              <option value="lookup">Look up booking</option>
+              <option value="cancel">Cancel booking</option>
+              <option value="reschedule">Request reschedule</option>
+            </select>
+          </div>
+          <div class="full" id="reschedule-note" hidden>
+            <label for="mg-note">Preferred new times (optional)</label>
+            <textarea id="mg-note" name="note" rows="3" placeholder="Suggest dates/times or leave blank and we will reply with options."></textarea>
+          </div>
+          <div class="full">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </form>
+      <div class="card" id="manage-result" hidden style="margin-top:1rem;"></div>
+    </div>
+  </main>
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/demo.js"></script>
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      if (params.get('token')) document.getElementById('mg-token').value = params.get('token');
+      const action = document.getElementById('mg-action');
+      const note = document.getElementById('reschedule-note');
+      action.addEventListener('change', () => {
+        note.hidden = action.value !== 'reschedule';
+      });
+      document.getElementById('manage-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const alertEl = document.getElementById('manage-alert');
+        const result = document.getElementById('manage-result');
+        const token = document.getElementById('mg-token').value.trim();
+        const act = action.value;
+        const noteVal = document.getElementById('mg-note').value.trim();
+        alertEl.hidden = true;
+        try {
+          let data;
+          if (window.DemoAPI && !SITE_CONFIG.APPS_SCRIPT_URL) {
+            data = await DemoAPI.manage({ token, action: act, note: noteVal });
+          } else {
+            const res = await fetch(SITE_CONFIG.APPS_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ action: 'manage', token, manageAction: act, note: noteVal })
+            });
+            data = await res.json();
+          }
+          if (!data.ok) throw new Error(data.error || 'Request failed');
+          result.hidden = false;
+          result.innerHTML = '<h3 class="mt-0">Result</h3><pre style="white-space:pre-wrap;font-family:inherit;">' +
+            (typeof data.message === 'string' ? data.message : JSON.stringify(data.booking || data, null, 2)) + '</pre>';
+          alertEl.className = 'alert alert-success';
+          alertEl.textContent = data.message || 'Done.';
+          alertEl.hidden = false;
+        } catch (err) {
+          alertEl.className = 'alert alert-error';
+          alertEl.textContent = err.message || 'Unable to process request.';
+          alertEl.hidden = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

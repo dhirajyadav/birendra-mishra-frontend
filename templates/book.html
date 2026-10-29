@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book a consultation | Birendra Mishra</title>
+  <meta name="description" content="Book a confidential consultation with Birendra Mishra. Choose a package, pick a slot up to 60 days ahead, and receive a Google Meet link by email." />
+  <meta name="theme-color" content="#101d2a" />
+  <link rel="canonical" href="https://birendramishra.com/book.html" />
+  <meta property="og:title" content="Book a consultation | Birendra Mishra" />
+  <meta property="og:description" content="Strategy consultations with Google Meet, up to 60 days ahead." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html" aria-label="Birendra Mishra home">
+        <span class="logo-name">Birendra Mishra</span>
+        <span class="logo-tag">Strategic Financial Leadership</span>
+      </a>
+      <nav class="nav" id="main-nav" aria-label="Primary">
+        <a href="index.html#services">Services</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="book.html" aria-current="page">Book</a>
+      </nav>
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+        <a class="btn btn-primary btn-sm" href="book.html">Book a consultation</a>
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container narrow">
+      <p class="eyebrow">Appointments</p>
+      <h1>Book a consultation</h1>
+      <p class="lead">Select a consultation type, choose a time within the next 60 days, and confirm your details. You will receive a calendar invitation with a Google Meet link.</p>
+
+      <div class="wizard-steps" aria-label="Booking progress">
+        <div class="wizard-step active" data-step-indicator="1">1 · Type</div>
+        <div class="wizard-step" data-step-indicator="2">2 · Schedule</div>
+        <div class="wizard-step" data-step-indicator="3">3 · Details</div>
+        <div class="wizard-step" data-step-indicator="4">4 · Confirm</div>
+      </div>
+
+      <div id="booking-alert" hidden></div>
+
+      <!-- Step 1 -->
+      <section id="step-1" class="card" aria-labelledby="step1-title">
+        <h2 id="step1-title" class="mt-0" style="font-size:1.5rem;">Choose a consultation</h2>
+        <div class="consult-options" id="consult-options"></div>
+        <div style="margin-top:1.25rem;display:flex;justify-content:flex-end;">
+          <button type="button" class="btn btn-primary" id="to-step-2" disabled>Continue</button>
+        </div>
+      </section>
+
+      <!-- Step 2 -->
+      <section id="step-2" class="card" hidden aria-labelledby="step2-title">
+        <h2 id="step2-title" class="mt-0" style="font-size:1.5rem;">Pick a date &amp; time</h2>
+        <p class="tz-note" id="tz-note"></p>
+        <div class="cal-nav">
+          <button type="button" class="btn btn-outline btn-sm" id="cal-prev" aria-label="Previous month">←</button>
+          <strong id="cal-month-label" class="text-ink"></strong>
+          <button type="button" class="btn btn-outline btn-sm" id="cal-next" aria-label="Next month">→</button>
+        </div>
+        <div class="cal-grid" id="cal-grid" role="grid" aria-label="Available dates"></div>
+        <h3 style="font-size:1.1rem;">Available times</h3>
+        <div id="slots-empty" class="muted">Select a date to see open slots.</div>
+        <div class="slots-grid" id="slots-grid" hidden></div>
+        <div style="margin-top:1.25rem;display:flex;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline" data-back="1">Back</button>
+          <button type="button" class="btn btn-primary" id="to-step-3" disabled>Continue</button>
+        </div>
+      </section>
+
+      <!-- Step 3 -->
+      <section id="step-3" class="card" hidden aria-labelledby="step3-title">
+        <h2 id="step3-title" class="mt-0" style="font-size:1.5rem;">Your details</h2>
+        <div class="summary-box" id="booking-summary-mini"></div>
+        <form id="details-form" novalidate>
+          <div class="form-grid">
+            <div>
+              <label for="bk-name">Full name *</label>
+              <input id="bk-name" name="name" required autocomplete="name" />
+            </div>
+            <div>
+              <label for="bk-email">Email *</label>
+              <input id="bk-email" name="email" type="email" required autocomplete="email" />
+            </div>
+            <div>
+              <label for="bk-company">Company</label>
+              <input id="bk-company" name="company" autocomplete="organization" />
+            </div>
+            <div>
+              <label for="bk-phone">Phone</label>
+              <input id="bk-phone" name="phone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="full">
+              <label for="bk-topic">Topic / focus *</label>
+              <input id="bk-topic" name="topic" required placeholder="e.g. Post-merger integration priorities" />
+            </div>
+            <div class="full">
+              <label for="bk-notes">Notes (optional)</label>
+              <textarea id="bk-notes" name="notes" rows="3" placeholder="Anything helpful to prepare for the session"></textarea>
+            </div>
+            <div class="full checkbox-row">
+              <input type="checkbox" id="bk-consent" name="consent" required />
+              <label for="bk-consent" style="font-weight:500;">I consent to being contacted about this booking and agree to the <a href="terms.html" target="_blank">terms</a> and <a href="privacy.html" target="_blank">privacy policy</a>.</label>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;display:flex;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" data-back="2">Back</button>
+            <button type="submit" class="btn btn-primary" id="to-step-4">Review &amp; confirm</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Step 4 -->
+      <section id="step-4" class="card" hidden aria-labelledby="step4-title">
+        <h2 id="step4-title" class="mt-0" style="font-size:1.5rem;">Confirm booking</h2>
+        <div class="summary-box" id="booking-summary-full"></div>
+        <div id="payment-step" hidden>
+          <div class="alert alert-info">
+            <strong>Payment</strong> — complete payment using the secure link below, then confirm your booking.
+            Payment is optional until the owner enables <code>requirePaymentBeforeConfirm</code> and sets payment links.
+          </div>
+          <a class="btn btn-gold" id="payment-link" href="#" target="_blank" rel="noopener">Pay now</a>
+        </div>
+        <div style="margin-top:1.25rem;display:flex;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline" data-back="3">Back</button>
+          <button type="button" class="btn btn-primary" id="confirm-booking">Confirm booking</button>
+        </div>
+      </section>
+
+      <!-- Success -->
+      <section id="step-success" class="card" hidden aria-labelledby="success-title">
+        <div class="alert alert-success">Your consultation is booked.</div>
+        <h2 id="success-title" class="mt-0" style="font-size:1.5rem;">Confirmation</h2>
+        <div class="summary-box" id="success-summary"></div>
+        <p>A confirmation email with the Google Meet link and calendar details has been sent.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1rem;">
+          <a class="btn btn-outline" id="add-to-calendar" href="#" download="consultation.ics">Add to calendar (.ics)</a>
+          <a class="btn btn-primary" href="index.html">Return home</a>
+          <a class="btn btn-outline" id="manage-link" href="manage.html">Manage booking</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom" style="border:0;padding:0;">
+      <span>© <span id="year"></span> Birendra Mishra</span>
+      <span><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="mailto:bbm@birendramishra.com">bbm@birendramishra.com</a></span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>
