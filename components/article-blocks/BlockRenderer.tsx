@@ -93,7 +93,17 @@ export default function BlockRenderer({ blocks }: BlockRendererProps) {
           const alt = block.media?.alternativeText || block.alt || 'Article visual';
           return (
             <figure key={key} className="article-figure">
-              <img src={imgUrl} alt={alt} loading="lazy" />
+              <img
+                src={imgUrl}
+                alt={alt}
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                    target.src = '/assets/oil-platforms.jpg';
+                  }
+                }}
+              />
             </figure>
           );
         }
@@ -110,6 +120,12 @@ export default function BlockRenderer({ blocks }: BlockRendererProps) {
                       src={getStrapiMediaUrl(img.url)}
                       alt={img.alternativeText || `Gallery image ${i + 1}`}
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                          target.src = '/assets/oil-platforms.jpg';
+                        }
+                      }}
                     />
                   </div>
                 ))}
@@ -123,7 +139,17 @@ export default function BlockRenderer({ blocks }: BlockRendererProps) {
           const alt = block.media?.alternativeText || block.alt || 'Article visual';
           return (
             <figure key={key} className="article-figure">
-              <img src={imgUrl} alt={alt} loading="lazy" />
+              <img
+                src={imgUrl}
+                alt={alt}
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                    target.src = '/assets/oil-platforms.jpg';
+                  }
+                }}
+              />
               {block.caption && <figcaption className="article-figcaption">{block.caption}</figcaption>}
             </figure>
           );

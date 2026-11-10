@@ -94,6 +94,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                       alt={article.title}
                       className="article-grid-img"
                       loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                          target.src = '/assets/oil-platforms.jpg';
+                        }
+                      }}
                     />
                   </div>
                   <div className="article-grid-body">

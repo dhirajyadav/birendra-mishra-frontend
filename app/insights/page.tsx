@@ -80,6 +80,12 @@ export default async function InsightsPage() {
                   alt={featured.title}
                   className="featured-article-img"
                   loading="eager"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                      target.src = '/assets/oil-platforms.jpg';
+                    }
+                  }}
                 />
               </div>
               <div className="featured-article-content">
@@ -128,6 +134,12 @@ export default async function InsightsPage() {
                     alt={article.title}
                     className="article-grid-img"
                     loading="lazy"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
+                        target.src = '/assets/oil-platforms.jpg';
+                      }
+                    }}
                   />
                 </div>
                 <div className="article-grid-body">

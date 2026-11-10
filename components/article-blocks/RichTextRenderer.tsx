@@ -74,6 +74,12 @@ function processRichTextHtml(html: string): string {
     (match, p1, p2, p3) => `${p1}${getStrapiMediaUrl(p2)}${p3}`
   );
 
+  // Auto-attach fallback onerror to all rich text images
+  processed = processed.replace(
+    /<img(?![^>]*\bonerror\b)([^>]*?)(\/?>)/gi,
+    '<img$1 onerror="this.onerror=null;this.src=\'/assets/oil-platforms.jpg\';" $2'
+  );
+
   processed = processed.replace(
     /(<(?:video|source|a)[^>]+(?:src|href)=["'])(\/uploads\/[^"']+)(["'])/gi,
     (match, p1, p2, p3) => `${p1}${getStrapiMediaUrl(p2)}${p3}`
