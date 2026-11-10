@@ -39,6 +39,30 @@ export async function POST(request: Request) {
       // Continue even if Strapi is not running locally
     }
 
+    // Forward to Google Apps Script for instant email notification & Google Sheet logging
+    const appsScriptUrl =
+      process.env.APPS_SCRIPT_URL ||
+      'https://script.google.com/macros/s/AKfycbwpZ7ZS4eO-cQmFa6trn3ilRPpmjMmAvhpxLCi4vwQvhljtatoj_DTq_oOQ46QBjxq6/exec';
+
+    if (appsScriptUrl) {
+      try {
+        await fetch(appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'enquiry',
+            name,
+            email,
+            topic,
+            message,
+            consent: true,
+          }),
+        });
+      } catch (err) {
+        console.warn('[Contact Route] Google Apps Script notification failed:', err);
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       message: 'Thank you. Your confidential enquiry has been received and will be answered shortly.',
