@@ -6,7 +6,12 @@ export const STRAPI_URL =
   (process.env.NODE_ENV === 'production'
     ? 'https://sienna-ibis-828899.hostingersite.com'
     : 'http://127.0.0.1:1337');
-export const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || '';
+export const STRAPI_TOKEN =
+  process.env.STRAPI_API_TOKEN &&
+  process.env.STRAPI_API_TOKEN !== 'bm_public_read_token' &&
+  !process.env.STRAPI_API_TOKEN.includes('temp')
+    ? process.env.STRAPI_API_TOKEN
+    : '';
 
 export function getStrapiMediaUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -41,7 +46,13 @@ export async function fetchFromStrapi<T>(
       fetchOptions.next = { revalidate };
     }
 
-    const res = await fetch(url, fetchOptions);
+    let res = await fetch(url, fetchOptions);
+
+    // If an invalid token caused 401 Unauthorized, automatically fallback to Public access
+    if (res.status === 401 && headers['Authorization']) {
+      delete headers['Authorization'];
+      res = await fetch(url, fetchOptions);
+    }
 
     if (!res.ok) {
       console.error(`[Strapi Fetch Failed] ${url} returned ${res.status}: ${res.statusText}`);
