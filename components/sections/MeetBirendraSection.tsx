@@ -113,12 +113,6 @@ export default function MeetBirendraSection({ data }: MeetBirendraProps) {
               width="700"
               height="933"
               loading="lazy"
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (!target.src.endsWith('/assets/birendra-executive.jpg')) {
-                  target.src = '/assets/birendra-executive.jpg';
-                }
-              }}
             />
             <div className="photo-overlay-badge">
               <span className="photo-badge-dot" aria-hidden="true"></span>

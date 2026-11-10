@@ -70,12 +70,6 @@ export default async function TagPage({ params }: TagPageProps) {
                       alt={article.title}
                       className="article-grid-img"
                       loading="lazy"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
-                          target.src = '/assets/oil-platforms.jpg';
-                        }
-                      }}
                     />
                   </div>
                   <div className="article-grid-body">

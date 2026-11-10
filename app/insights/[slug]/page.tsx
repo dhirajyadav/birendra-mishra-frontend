@@ -193,12 +193,6 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
                 : '/assets/oil-platforms.jpg'
             }
             alt={article.title}
-            onError={(e) => {
-              const target = e.currentTarget;
-              if (!target.src.endsWith('/assets/oil-platforms.jpg')) {
-                target.src = '/assets/oil-platforms.jpg';
-              }
-            }}
           />
         </div>
 

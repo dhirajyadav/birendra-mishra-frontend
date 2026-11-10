@@ -19,14 +19,6 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.hostingersite.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'sienna-ibis-828899.hostingersite.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'api.birendramishra.com',
       },
       {
