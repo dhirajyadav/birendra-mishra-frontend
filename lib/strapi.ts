@@ -1,6 +1,11 @@
 import { GlobalSettings, PageData, Article, Category, HomepageData } from './types';
 
-export const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://127.0.0.1:1337';
+export const STRAPI_URL =
+  process.env.STRAPI_URL ||
+  process.env.NEXT_PUBLIC_STRAPI_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://sienna-ibis-828899.hostingersite.com'
+    : 'http://127.0.0.1:1337');
 export const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || '';
 
 export function getStrapiMediaUrl(url: string | null | undefined): string {
@@ -39,12 +44,14 @@ export async function fetchFromStrapi<T>(
     const res = await fetch(url, fetchOptions);
 
     if (!res.ok) {
+      console.error(`[Strapi Fetch Failed] ${url} returned ${res.status}: ${res.statusText}`);
       return null;
     }
 
     const json = await res.json();
     return json.data as T;
-  } catch {
+  } catch (err: any) {
+    console.error(`[Strapi Network Error] ${url}:`, err?.message || err);
     return null;
   }
 }
