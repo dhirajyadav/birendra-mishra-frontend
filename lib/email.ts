@@ -19,24 +19,26 @@ function escapeHtml(str: string): string {
 }
 
 export function getSmtpTransporter() {
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = parseInt(process.env.SMTP_PORT || '465', 10);
   const user = process.env.SMTP_USER || process.env.GMAIL_USER || '';
   const pass =
     process.env.SMTP_PASS ||
     process.env.GMAIL_PASS ||
     process.env.GMAIL_APP_PASSWORD ||
     '';
-  const secure = process.env.SMTP_SECURE
-    ? process.env.SMTP_SECURE === 'true'
-    : port === 465;
 
   if (!user || !pass) {
     return null;
   }
 
-  // Remove spaces if user copied Google App Password with spaces (e.g. "abcd efgh ijkl mnop")
-  const cleanPass = pass.replace(/\s+/g, '');
+  // Auto-detect Hostinger vs Gmail based on domain
+  const defaultHost = user.includes('@gmail.com') ? 'smtp.gmail.com' : 'smtp.hostinger.com';
+  const host = process.env.SMTP_HOST || defaultHost;
+  const port = parseInt(process.env.SMTP_PORT || '465', 10);
+  const secure = process.env.SMTP_SECURE
+    ? process.env.SMTP_SECURE === 'true'
+    : port === 465;
+
+  const cleanPass = pass.trim();
 
   return nodemailer.createTransport({
     host,
@@ -56,13 +58,13 @@ export async function sendEnquiryViaSmtp(data: EnquiryEmailData): Promise<boolea
     return false;
   }
 
+  const user = process.env.SMTP_USER || process.env.GMAIL_USER || 'bbm@birendramishra.com';
   const recipient =
     process.env.SMTP_TO ||
     process.env.CONTACT_NOTIFICATION_EMAIL ||
-    'birendra.b.mishra@gmail.com';
+    user;
 
-  const user = process.env.SMTP_USER || process.env.GMAIL_USER || 'birendra.b.mishra@gmail.com';
-  const fromName = process.env.SMTP_FROM_NAME || 'Birendra Mishra Website';
+  const fromName = process.env.SMTP_FROM_NAME || 'Birendra Mishra';
   const timestamp = data.submittedAt || new Date().toUTCString();
 
   const executiveNotificationHtml = `
@@ -212,3 +214,4 @@ export async function sendEnquiryViaSmtp(data: EnquiryEmailData): Promise<boolea
     return false;
   }
 }
+
