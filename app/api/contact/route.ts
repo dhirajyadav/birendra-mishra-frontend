@@ -23,7 +23,12 @@ export async function POST(request: Request) {
     const submittedAt = new Date().toISOString();
 
     // 1. Forward to Strapi backend database
-    const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+    const strapiUrl =
+      process.env.STRAPI_URL ||
+      process.env.NEXT_PUBLIC_STRAPI_URL ||
+      (process.env.NODE_ENV === 'production'
+        ? 'https://admin.birendramishra.com'
+        : 'http://localhost:1337');
     try {
       await fetch(`${strapiUrl}/api/enquiries`, {
         method: 'POST',

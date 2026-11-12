@@ -4,7 +4,7 @@ export const STRAPI_URL =
   process.env.STRAPI_URL ||
   process.env.NEXT_PUBLIC_STRAPI_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://sienna-ibis-828899.hostingersite.com'
+    ? 'https://admin.birendramishra.com'
     : 'http://127.0.0.1:1337');
 export const STRAPI_TOKEN =
   process.env.STRAPI_API_TOKEN &&

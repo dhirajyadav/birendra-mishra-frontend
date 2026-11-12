@@ -19,7 +19,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'admin.birendramishra.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'api.birendramishra.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'birendramishra.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.hostingersite.com',
       },
       {
         protocol: 'http',
