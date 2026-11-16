@@ -87,36 +87,74 @@ function processRichTextHtml(html: string): string {
     );
   }
 
-  // 3. Clean pasted inline styles from Google Docs, Word, or external rich text editors
+  // 3. Strip CKEditor markers & list helper classes
   processed = processed.replace(/--ck-[^;"]+;?/gi, '');
+  processed = processed.replace(/class=["']\s*ck-list-marker-[^"']*["']/gi, '');
+  processed = processed.replace(/data-list-item-id=["'][^"']*["']/gi, '');
+
+  // 4. Unroll headings mistakenly wrapped in <ol><li> or <ul><li> (common Word paste bug)
+  processed = processed.replace(/<(?:ol|ul)[^>]*>\s*<li[^>]*>\s*(<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>)\s*(?:<p>\s*(?:&nbsp;|\s)*<\/p>\s*)?<\/li>\s*<\/(?:ol|ul)>/gi, '$1');
+  processed = processed.replace(/<li[^>]*>\s*(<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>)\s*<\/li>/gi, '$1');
+
+  // 5. Demote content <h1> tags to <h2> (page title is already <h1>)
+  processed = processed.replace(/<(\/?)h1(?:\s+[^>]*)?>/gi, '<$1h2>');
+
+  // 6. Strip hardcoded Word/Docs styles (fonts, sizes, colors, cell paddings/borders)
   processed = processed.replace(/font-family:\s*['"][^'"]*['"][^;"]*;?/gi, '');
   processed = processed.replace(/font-family:\s*[^;"]+;?/gi, '');
   processed = processed.replace(/font-size:\s*[^;"]+;?/gi, '');
   processed = processed.replace(/background-color:\s*transparent;?/gi, '');
   processed = processed.replace(/background-color:\s*#0b5394;?/gi, '');
-  processed = processed.replace(/color:\s*(?:hsl\([^)]+\)|#[0-9a-fA-F]{3,6});?/gi, '');
+  processed = processed.replace(/color:\s*(?:hsl\([^)]+\)|#[0-9a-fA-F]{3,6}|rgb\([^)]+\));?/gi, '');
   processed = processed.replace(/border(?:-[a-z]+)?:\s*[^;"]+;?/gi, '');
-  processed = processed.replace(/padding:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/padding(?:-[a-z]+)?:\s*[^;"]+;?/gi, '');
   processed = processed.replace(/vertical-align:\s*top;?/gi, '');
+
+  // 7. Strip hardcoded width & height attributes on images so they obey responsive executive styling
+  processed = processed.replace(/(<img[^>]+?)\s+(?:width|height)=["']\d+["']/gi, '$1');
+  processed = processed.replace(/(<img[^>]+?)\s+(?:width|height)=["']\d+["']/gi, '$1');
+
+  // 8. Strip hardcoded width styles from tables & figure.table
+  processed = processed.replace(/(<figure[^>]+class=["'][^"']*table[^"']*["'])[^>]*style=["'][^"']*["']/gi, '$1');
+  processed = processed.replace(/(<table[^>]*)[^>]*style=["'][^"']*["']/gi, '$1');
+  processed = processed.replace(/<colgroup>[\s\S]*?<\/colgroup>/gi, '');
+
+  // 9. Clean empty style attributes
   processed = processed.replace(/style=["']\s*;?\s*["']/gi, '');
-  for (let i = 0; i < 3; i++) {
+
+  // 10. Unwrap redundant spans
+  for (let i = 0; i < 4; i++) {
     processed = processed.replace(/<span\s*>([\s\S]*?)<\/span>/gi, '$1');
   }
-  processed = processed.replace(/<p>\s*(<img[^>]+>)\s*<\/p>/gi, '<figure class="article-figure">$1</figure>');
-  processed = processed.replace(/<h[1-6]>\s*(?:&nbsp;|\s)*<\/h[1-6]>/gi, '');
-  processed = processed.replace(/<p>\s*(?:&nbsp;|\s)*<\/p>/gi, '');
 
-  // 4. Ensure tables have .article-table class and are wrapped in .article-table-wrap
-  processed = processed.replace(/<figure class="table">\s*<table([^>]*)>/gi, '<div class="article-table-wrap"><table class="article-table"$1>');
+  // 11. Remove empty headings and paragraph spacers (&nbsp;, <br>, empty lines)
+  processed = processed.replace(/<h[1-6]>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/h[1-6]>/gi, '');
+  processed = processed.replace(/<p>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, '');
+  processed = processed.replace(/(?:<p>\s*&nbsp;\s*<\/p>\s*)+/gi, '');
+
+  // 12. Normalize standalone images to <figure class="article-figure">
+  processed = processed.replace(/<p>\s*(?:<[u|span|a][^>]*>\s*)*(<img[^>]+>)(?:\s*<\/[u|span|a]>)*\s*<\/p>/gi, '<figure class="article-figure">$1</figure>');
+  processed = processed.replace(/<p>\s*(<img[^>]+>)\s*([\s\S]+?)<\/p>/gi, '<figure class="article-figure">$1</figure><p>$2</p>');
+
+  // 13. Ensure tables have executive wrapper and headers
+  processed = processed.replace(/<figure class="table(?:\s+[^"]*)?">\s*<table([^>]*)>/gi, '<div class="article-table-wrap"><table class="article-table"$1>');
   processed = processed.replace(/<\/table>\s*<\/figure>/gi, '</table></div>');
-
   if (!processed.includes('article-table-wrap')) {
-    processed = processed.replace(
-      /(<table[\s\S]*?<\/table>)/gi,
-      '<div class="article-table-wrap">$1</div>'
-    );
+    processed = processed.replace(/(<table[\s\S]*?<\/table>)/gi, '<div class="article-table-wrap">$1</div>');
   }
   processed = processed.replace(/<table(?!\s+class=["'][^"']*article-table)/gi, '<table class="article-table"');
+
+  // Convert first <tr> in tables without <thead> into a <thead> with <th>
+  processed = processed.replace(
+    /(<table[^>]*>)\s*<tbody>\s*<tr>([\s\S]*?)<\/tr>/gi,
+    (match, tableOpen, firstRowContent) => {
+      if (firstRowContent.includes('<td') && (firstRowContent.includes('<strong>') || firstRowContent.includes('<b>'))) {
+        const headerRow = firstRowContent.replace(/<td(?:\s+[^>]*)?>([\s\S]*?)<\/td>/gi, '<th>$1</th>');
+        return `${tableOpen}<thead><tr>${headerRow}</tr></thead><tbody>`;
+      }
+      return match;
+    }
+  );
 
   // 5. Shortcode Support: [pdf: Title | Subtitle | URL] or [[pdf: ...]]
   processed = processed.replace(
