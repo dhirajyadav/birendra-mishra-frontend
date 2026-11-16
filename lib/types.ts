@@ -150,6 +150,13 @@ export interface HeroSectionData {
   engagementValue?: string;
   discretionLabel?: string;
   discretionValue?: string;
+  backgroundImage?: {
+    id?: number;
+    url: string;
+    alternativeText?: string;
+    width?: number;
+    height?: number;
+  };
   trustItems?: { id?: number; text: string }[];
 }
 

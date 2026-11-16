@@ -1,11 +1,20 @@
 import React from 'react';
 import { HeroSectionData } from '@/lib/types';
+import { getStrapiMediaUrl } from '@/lib/strapi';
 
 interface HeroProps {
   data?: HeroSectionData;
 }
 
 export default function HeroSection({ data }: HeroProps) {
+  const rawBgUrl =
+    data?.backgroundImage?.url ||
+    (data as any)?.photo?.url ||
+    (data as any)?.image?.url;
+  const bgImageUrl = rawBgUrl
+    ? getStrapiMediaUrl(rawBgUrl)
+    : '/assets/oil-platforms.jpg';
+
   const eyebrow = data?.eyebrow || 'Strategic Financial Leadership';
   const description =
     data?.description ||
@@ -36,7 +45,11 @@ export default function HeroSection({ data }: HeroProps) {
   const trustItems = data?.trustItems && data.trustItems.length > 0 ? data.trustItems : defaultTrustItems;
 
   return (
-    <section className="hero" aria-label="Strategic Financial Leadership">
+    <section
+      className="hero"
+      aria-label="Strategic Financial Leadership"
+      style={{ '--hero-bg-image': `url("${bgImageUrl}")` } as React.CSSProperties}
+    >
       <div className="container hero-container">
         <div className="hero-grid">
           <div className="hero-content">

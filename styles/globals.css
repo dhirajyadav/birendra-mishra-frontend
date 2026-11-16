@@ -369,6 +369,7 @@ section[id] {
   overflow: hidden;
   background-color: #F4F8FC;
   padding: clamp(4.25rem, 7.5vw, 6.5rem) 0 clamp(3.5rem, 5.5vw, 5rem);
+  --hero-bg-image: url("/assets/oil-platforms.jpg");
 }
 
 .hero::before {
@@ -387,7 +388,7 @@ section[id] {
       rgba(244, 248, 252, 0.28) 60%,
       rgba(244, 248, 252, 0.20) 80%,
       rgba(244, 248, 252, 0.15) 100%),
-    url("/assets/oil-platforms.jpg") center 48% / cover no-repeat;
+    var(--hero-bg-image) center 48% / cover no-repeat;
   pointer-events: none;
 }
 
@@ -407,7 +408,7 @@ section[id] {
       rgba(4, 29, 86, 0.32) 60%,
       rgba(4, 29, 86, 0.22) 80%,
       rgba(4, 29, 86, 0.18) 100%),
-    url("/assets/oil-platforms.jpg") center 48% / cover no-repeat;
+    var(--hero-bg-image) center 48% / cover no-repeat;
 }
 
 .hero-grid {
