@@ -87,7 +87,26 @@ function processRichTextHtml(html: string): string {
     );
   }
 
-  // 3. Ensure tables have .article-table class and are wrapped in .article-table-wrap
+  // 3. Clean pasted inline styles from Google Docs, Word, or external rich text editors
+  processed = processed.replace(/--ck-[^;"]+;?/gi, '');
+  processed = processed.replace(/font-family:\s*['"][^'"]*['"][^;"]*;?/gi, '');
+  processed = processed.replace(/font-family:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/font-size:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/background-color:\s*transparent;?/gi, '');
+  processed = processed.replace(/background-color:\s*#0b5394;?/gi, '');
+  processed = processed.replace(/color:\s*(?:hsl\([^)]+\)|#[0-9a-fA-F]{3,6});?/gi, '');
+  processed = processed.replace(/border(?:-[a-z]+)?:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/padding:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/vertical-align:\s*top;?/gi, '');
+  processed = processed.replace(/style=["']\s*;?\s*["']/gi, '');
+  for (let i = 0; i < 3; i++) {
+    processed = processed.replace(/<span\s*>([\s\S]*?)<\/span>/gi, '$1');
+  }
+  processed = processed.replace(/<p>\s*(<img[^>]+>)\s*<\/p>/gi, '<figure class="article-figure">$1</figure>');
+  processed = processed.replace(/<h[1-6]>\s*(?:&nbsp;|\s)*<\/h[1-6]>/gi, '');
+  processed = processed.replace(/<p>\s*(?:&nbsp;|\s)*<\/p>/gi, '');
+
+  // 4. Ensure tables have .article-table class and are wrapped in .article-table-wrap
   processed = processed.replace(/<figure class="table">\s*<table([^>]*)>/gi, '<div class="article-table-wrap"><table class="article-table"$1>');
   processed = processed.replace(/<\/table>\s*<\/figure>/gi, '</table></div>');
 
@@ -99,7 +118,7 @@ function processRichTextHtml(html: string): string {
   }
   processed = processed.replace(/<table(?!\s+class=["'][^"']*article-table)/gi, '<table class="article-table"');
 
-  // 4. Shortcode Support: [pdf: Title | Subtitle | URL] or [[pdf: ...]]
+  // 5. Shortcode Support: [pdf: Title | Subtitle | URL] or [[pdf: ...]]
   processed = processed.replace(
     /(?:<p(?:\s+[^>]*)?>\s*)?(?:\[\[|\[)pdf:\s*([^|\]]+)(?:\|\s*([^|\]]+))?(?:\|\s*([^\]]+))?(?:\]\]|\])(?:\s*<\/p>)?/gi,
     (_match, p1, p2, p3) => {
