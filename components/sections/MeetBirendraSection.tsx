@@ -6,6 +6,74 @@ interface MeetBirendraProps {
   data?: MeetBirendraSectionData;
 }
 
+/**
+ * Sanitizes rich text from CKEditor for Meet Birendra section:
+ * - Strips any hardcoded font-family, font-size, and background colors pasted from Word/Docs
+ * - Preserves semantic formatting: <strong>, <em>, <a>, <u>, <span>
+ */
+function cleanMeetRichText(html: string): string {
+  if (!html) return '';
+  let processed = html;
+  processed = processed.replace(/font-family:\s*['"][^'"]*['"][^;"]*;?/gi, '');
+  processed = processed.replace(/font-family:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/font-size:\s*[^;"]+;?/gi, '');
+  processed = processed.replace(/background-color:\s*transparent;?/gi, '');
+  processed = processed.replace(/style=["']\s*;?\s*["']/gi, '');
+  return processed;
+}
+
+/**
+ * Extracts inner HTML for inline elements (headings, lead paragraphs)
+ */
+function renderInlineRich(content?: string | null): { __html: string } {
+  if (!content) return { __html: '' };
+  const cleaned = cleanMeetRichText(content)
+    .replace(/^<p[^>]*>/i, '')
+    .replace(/<\/p>$/i, '')
+    .replace(/^<h[1-6][^>]*>/i, '')
+    .replace(/<\/h[1-6]>$/i, '')
+    .trim();
+  return { __html: cleaned };
+}
+
+/**
+ * Renders a bio narrative paragraph with HTML/formatting support.
+ */
+function renderBioParagraphItem(text?: string | null) {
+  if (!text) return null;
+  const raw = text.trim();
+  if (!raw) return null;
+
+  const cleaned = cleanMeetRichText(raw);
+
+  // If text contains HTML tags
+  if (/<[a-z][\s\S]*>/i.test(cleaned)) {
+    // If it has multiple <p> tags, render as div containing those paragraphs
+    if ((cleaned.match(/<p[^>]*>/gi) || []).length > 1) {
+      return <div className="profile-bio-multiblock" dangerouslySetInnerHTML={{ __html: cleaned }} />;
+    }
+    // Single <p> or inline html
+    const inner = cleaned.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
+    return <p dangerouslySetInnerHTML={{ __html: inner }} />;
+  }
+
+  // If text has newlines (\n\n), split into multiple <p>
+  if (cleaned.includes('\n')) {
+    const parts = cleaned.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    if (parts.length > 1) {
+      return (
+        <>
+          {parts.map((part, idx) => (
+            <p key={idx}>{part}</p>
+          ))}
+        </>
+      );
+    }
+  }
+
+  return <p>{cleaned}</p>;
+}
+
 export default function MeetBirendraSection({ data }: MeetBirendraProps) {
   const photoUrl = data?.photo?.url
     ? getStrapiMediaUrl(data.photo.url)
@@ -215,15 +283,15 @@ export default function MeetBirendraSection({ data }: MeetBirendraProps) {
 
           {/* Executive Background Narrative */}
           <div className="profile-bio-narrative">
-            <p>{p1}</p>
-            <p>{p2}</p>
-            <p>{p3}</p>
+            {renderBioParagraphItem(p1)}
+            {renderBioParagraphItem(p2)}
+            {renderBioParagraphItem(p3)}
           </div>
 
           {/* Strategic Capabilities & Value to Organisation */}
           <div className="profile-capabilities-block">
-            <h3 className="profile-section-heading">{capabilitiesHeading}</h3>
-            <p className="profile-intro-lead">{capabilitiesLead}</p>
+            <h3 className="profile-section-heading" dangerouslySetInnerHTML={renderInlineRich(capabilitiesHeading)} />
+            <p className="profile-intro-lead" dangerouslySetInnerHTML={renderInlineRich(capabilitiesLead)} />
 
             <div className="capabilities-value-list">
               {cards.map((c, idx) => (

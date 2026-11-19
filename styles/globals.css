@@ -7709,7 +7709,8 @@ section[id] {
   border-left-color: #173E94;
 }
 
-.profile-bio-narrative p {
+.profile-bio-narrative p,
+.profile-bio-multiblock p {
   font-family: var(--font-sans);
   font-size: clamp(1rem, 1.15vw, 1.06rem);
   line-height: 1.75;
@@ -7717,22 +7718,57 @@ section[id] {
   margin: 0 0 1rem 0;
 }
 
-.profile-bio-narrative p:first-child {
+.profile-bio-narrative > p:first-child,
+.profile-bio-narrative > .profile-bio-multiblock:first-child > p:first-child {
   font-size: clamp(1.04rem, 1.2vw, 1.12rem);
   color: #0F2573;
   font-weight: 500;
 }
 
-[data-theme="dark"] .profile-bio-narrative p:first-child {
+[data-theme="dark"] .profile-bio-narrative > p:first-child,
+[data-theme="dark"] .profile-bio-narrative > .profile-bio-multiblock:first-child > p:first-child {
   color: #EEF6FC;
 }
 
-.profile-bio-narrative p:last-child {
+.profile-bio-narrative p:last-child,
+.profile-bio-multiblock p:last-child {
   margin-bottom: 0;
 }
 
-[data-theme="dark"] .profile-bio-narrative p {
+[data-theme="dark"] .profile-bio-narrative p,
+[data-theme="dark"] .profile-bio-multiblock p {
   color: #D6E8F7;
+}
+
+.profile-bio-narrative strong,
+.profile-intro-lead strong,
+.profile-section-heading strong {
+  color: #041D56;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .profile-bio-narrative strong,
+[data-theme="dark"] .profile-intro-lead strong,
+[data-theme="dark"] .profile-section-heading strong {
+  color: #ADE1FB;
+}
+
+.profile-bio-narrative em,
+.profile-intro-lead em {
+  font-style: italic;
+}
+
+.profile-bio-narrative a,
+.profile-intro-lead a {
+  color: #266CA9;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+
+.profile-bio-narrative a:hover,
+.profile-intro-lead a:hover {
+  color: #041D56;
 }
 
 /* Strategic Capabilities Block */
