@@ -101,7 +101,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
   };
 
   return (
-    <article>
+    <article className="article-detail-page">
       {isPreview && (
         <div
           style={{
@@ -187,74 +187,68 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
         </div>
       </header>
 
-      <div className="container">
-        <div className="article-featured-hero-image">
-          <img
-            src={
-              article.featuredImage?.url
-                ? getStrapiMediaUrl(article.featuredImage.url)
-                : '/assets/oil-platforms.jpg'
-            }
-            alt={article.title}
-          />
-        </div>
+      <main className="article-detail-main">
+        <div className="container">
+          <div className="article-reading-container">
+            {article.featuredImage?.url && (
+              <div className="article-featured-hero-image">
+                <img
+                  src={getStrapiMediaUrl(article.featuredImage.url)}
+                  alt={article.title}
+                />
+              </div>
+            )}
 
-        {/* Main Continuous WYSIWYG Content (with fallback to legacy Dynamic Zone blocks) */}
-        {article.content ? (
-          <RichTextRenderer content={article.content} />
-        ) : (
-          <BlockRenderer blocks={article.blocks} />
-        )}
+            {/* Main Continuous WYSIWYG Content (with fallback to legacy Dynamic Zone blocks) */}
+            {article.content ? (
+              <RichTextRenderer content={article.content} />
+            ) : (
+              <div className="article-content-body wysiwyg-content">
+                <BlockRenderer blocks={article.blocks} />
+              </div>
+            )}
+          </div>
 
-        {/* Related Articles Footer */}
-        {related.length > 0 && (
-          <section
-            style={{
-              marginTop: '4rem',
-              paddingTop: '3rem',
-              borderTop: '1px solid var(--line)',
-              marginBottom: '4rem',
-            }}
-          >
-            <h3
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '2rem',
-                marginBottom: '1.5rem',
-                color: 'var(--ink)',
-              }}
-            >
-              Further Strategic Reading
-            </h3>
-            <div className="articles-masonry">
-              {related.map((rel) => (
-                <article key={rel.id} className="article-grid-card">
-                  <div className="article-grid-body">
-                    <span className="article-category-tag">
-                      {rel.category?.name || 'Insights'}
-                    </span>
-                    <h4 className="article-card-title">
-                      <Link href={`/insights/${rel.slug}`}>{rel.title}</Link>
-                    </h4>
-                    <p className="article-card-excerpt">
-                      {rel.shortDescription || rel.excerpt}
-                    </p>
-                    <div className="article-card-footer">
-                      <span>{rel.readingTime || '5 min read'}</span>
-                      <Link
-                        href={`/insights/${rel.slug}`}
-                        style={{ color: 'var(--blue-ocean)', fontWeight: 600, textDecoration: 'none' }}
-                      >
-                        Read analysis ↗
-                      </Link>
+          {/* Related Articles Footer */}
+          {related.length > 0 && (
+            <section className="article-related-section">
+              <h3 className="article-related-title">
+                Further Strategic Reading
+              </h3>
+              <div className="articles-masonry">
+                {related.map((rel) => (
+                  <article key={rel.id} className="article-grid-card">
+                    <div className="article-grid-body">
+                      <span className="article-category-tag">
+                        {rel.category?.name || 'Insights'}
+                      </span>
+                      <h4 className="article-card-title">
+                        <Link href={`/insights/${rel.slug}`}>{rel.title}</Link>
+                      </h4>
+                      <p className="article-card-excerpt">
+                        {rel.shortDescription || rel.excerpt}
+                      </p>
+                      <div className="article-card-footer">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--muted)' }}>
+                          {getArticleDate(rel) && <span style={{ fontWeight: 500 }}>{getArticleDate(rel)}</span>}
+                          {getArticleDate(rel) && <span>·</span>}
+                          <span>{rel.readingTime || '5 min read'}</span>
+                        </div>
+                        <Link
+                          href={`/insights/${rel.slug}`}
+                          style={{ color: 'var(--blue-ocean)', fontWeight: 600, textDecoration: 'none' }}
+                        >
+                          Read analysis ↗
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </main>
     </article>
   );
 }
