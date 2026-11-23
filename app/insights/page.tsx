@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getArticles, getCategories, getStrapiMediaUrl } from '@/lib/strapi';
+import { getArticles, getCategories, getStrapiMediaUrl, getArticleDate } from '@/lib/strapi';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +27,9 @@ export default async function InsightsPage() {
     getCategories(),
   ]);
 
-  const featured = articles.find((a) => a.featuredArticle) || articles[0];
-  const regularArticles = articles.filter((a) => a.id !== featured?.id);
+  // The latest article is always at the top hero, followed by remaining articles in strict chronological sequence
+  const featured = articles[0];
+  const regularArticles = articles.slice(1);
 
   return (
     <main>
@@ -99,6 +100,18 @@ export default async function InsightsPage() {
                     />
                     <span>{featured.author?.name || 'Birendra Mishra'}</span>
                   </div>
+                  {getArticleDate(featured) && (
+                    <>
+                      <span>·</span>
+                      <time
+                        dateTime={featured.createdAt || featured.publishedAt}
+                        className="article-meta-date"
+                        style={{ color: 'var(--muted)', fontWeight: 500 }}
+                      >
+                        {getArticleDate(featured)}
+                      </time>
+                    </>
+                  )}
                   <span>·</span>
                   <span>{featured.readingTime || '5 min read'}</span>
                   {featured.category && (
@@ -141,7 +154,15 @@ export default async function InsightsPage() {
                     {article.shortDescription || article.excerpt}
                   </p>
                   <div className="article-card-footer">
-                    <span>{article.readingTime || '4 min read'}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--muted)' }}>
+                      {getArticleDate(article) && (
+                        <time dateTime={article.createdAt || article.publishedAt} style={{ fontWeight: 500 }}>
+                          {getArticleDate(article)}
+                        </time>
+                      )}
+                      {getArticleDate(article) && <span>·</span>}
+                      <span>{article.readingTime || '4 min read'}</span>
+                    </div>
                     <Link
                       href={`/insights/${article.slug}`}
                       style={{ color: 'var(--blue-ocean)', fontWeight: 600, textDecoration: 'none' }}

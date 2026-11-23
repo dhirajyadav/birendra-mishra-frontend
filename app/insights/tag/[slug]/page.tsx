@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { getArticles, getStrapiMediaUrl } from '@/lib/strapi';
+import { getArticles, getStrapiMediaUrl, getArticleDate } from '@/lib/strapi';
 
 interface TagPageProps {
   params: Promise<{ slug: string }>;
@@ -83,7 +83,15 @@ export default async function TagPage({ params }: TagPageProps) {
                       {article.shortDescription || article.excerpt}
                     </p>
                     <div className="article-card-footer">
-                      <span>{article.readingTime || '4 min read'}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--muted)' }}>
+                        {getArticleDate(article) && (
+                          <time dateTime={article.createdAt || article.publishedAt} style={{ fontWeight: 500 }}>
+                            {getArticleDate(article)}
+                          </time>
+                        )}
+                        {getArticleDate(article) && <span>·</span>}
+                        <span>{article.readingTime || '4 min read'}</span>
+                      </div>
                       <Link
                         href={`/insights/${article.slug}`}
                         style={{ color: 'var(--blue-ocean)', fontWeight: 600, textDecoration: 'none' }}

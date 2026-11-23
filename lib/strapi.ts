@@ -199,6 +199,27 @@ export const defaultArticles: Article[] = [
   },
 ];
 
+export function formatArticleDate(dateStr?: string | null): string {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return '';
+  }
+}
+
+export function getArticleDate(article: { publishedAt?: string | null; createdAt?: string | null }): string {
+  if (!article) return '';
+  const dateStr = article.createdAt || article.publishedAt;
+  return formatArticleDate(dateStr);
+}
+
 export async function getGlobalSettings(): Promise<GlobalSettings> {
   const data = await fetchFromStrapi<{ attributes?: GlobalSettings } & GlobalSettings>('global', { populate: '*' });
   if (data) {
@@ -210,10 +231,14 @@ export async function getGlobalSettings(): Promise<GlobalSettings> {
 export async function getArticles(): Promise<Article[]> {
   const data = await fetchFromStrapi<Article[]>('articles', {
     populate: '*',
-    'sort[0]': 'publishedAt:desc',
+    'sort[0]': 'createdAt:desc',
   });
   if (data && Array.isArray(data) && data.length > 0) {
-    return data;
+    return [...data].sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.publishedAt || 0).getTime();
+      const timeB = new Date(b.createdAt || b.publishedAt || 0).getTime();
+      return timeB - timeA;
+    });
   }
   return defaultArticles;
 }
@@ -221,7 +246,7 @@ export async function getArticles(): Promise<Article[]> {
 /**
  * Fetches the latest published articles for the Homepage Insights section.
  * - Filters strictly to published articles (Strapi default).
- * - Sorts by publishedAt descending.
+ * - Sorts by createdAt descending (newest first).
  * - Limits strictly to `limit` entries (default 3).
  * - Populates category, author, and featured media.
  * - Gracefully handles empty or error state.
@@ -229,14 +254,18 @@ export async function getArticles(): Promise<Article[]> {
 export async function getLatestArticles(limit: number = 3): Promise<Article[]> {
   const params: Record<string, string> = {
     populate: '*',
-    'sort[0]': 'publishedAt:desc',
+    'sort[0]': 'createdAt:desc',
     'pagination[pageSize]': String(limit),
   };
 
   try {
     const data = await fetchFromStrapi<Article[]>('articles', params, 0);
     if (data && Array.isArray(data)) {
-      return data;
+      return [...data].sort((a, b) => {
+        const timeA = new Date(a.createdAt || a.publishedAt || 0).getTime();
+        const timeB = new Date(b.createdAt || b.publishedAt || 0).getTime();
+        return timeB - timeA;
+      });
     }
   } catch (err) {
     console.error('Error fetching latest published articles from Strapi:', err);

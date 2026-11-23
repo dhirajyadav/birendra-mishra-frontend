@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Article, InsightsSectionData } from '@/lib/types';
+import { getArticleDate } from '@/lib/strapi';
 
 interface InsightsSectionProps {
   data?: InsightsSectionData;
@@ -84,7 +85,17 @@ export default function InsightsSection({ data, articles, linkedInUrl }: Insight
                   key={article.id || article.slug || idx}
                 >
                   <div className="insight-card-body">
-                    <span className="insight-tag">{categoryName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+                      <span className="insight-tag">{categoryName}</span>
+                      {getArticleDate(article) && (
+                        <time
+                          dateTime={article.createdAt || article.publishedAt}
+                          style={{ fontSize: '0.8rem', color: 'var(--muted)', fontWeight: 500 }}
+                        >
+                          {getArticleDate(article)}
+                        </time>
+                      )}
+                    </div>
                     <h3 className="insight-title">
                       <Link href={articleHref}>{article.title}</Link>
                     </h3>

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getArticleBySlug, getArticles, getStrapiMediaUrl } from '@/lib/strapi';
+import { getArticleBySlug, getArticles, getStrapiMediaUrl, getArticleDate } from '@/lib/strapi';
 import BlockRenderer from '@/components/article-blocks/BlockRenderer';
 import RichTextRenderer from '@/components/article-blocks/RichTextRenderer';
 
@@ -149,6 +149,9 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
                 </div>
                 <div className="author-large-role">
                   {article.author?.role || 'Senior Executive · Strategic Financial Leadership'}
+                  {getArticleDate(article) && (
+                    <span className="article-meta-date"> · {getArticleDate(article)}</span>
+                  )}
                   {article.readingTime && <span className="article-meta-reading-time"> · {article.readingTime}</span>}
                 </div>
               </div>
