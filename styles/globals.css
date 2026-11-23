@@ -8339,30 +8339,28 @@ section[id] {
 
 /* Single Article Detail */
 .article-detail-page {
-  background: #ffffff;
+  background: var(--bg);
   min-height: 100vh;
-  color: #1A202C;
   position: relative;
 }
 
 [data-theme="dark"] .article-detail-page {
   background: var(--bg);
-  color: var(--fg);
 }
 
 .article-detail-header {
   padding: calc(var(--header-h) + 2.75rem) 0 2.25rem;
-  border-bottom: 1px solid rgba(4, 29, 86, 0.08);
-  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+  background: var(--hero-grad);
 }
 
 [data-theme="dark"] .article-detail-header {
-  background: var(--bg);
+  background: var(--hero-grad);
   border-bottom-color: var(--line);
 }
 
 .article-detail-main {
-  background: #ffffff;
+  background: var(--bg);
   padding: 3rem 0 5.5rem;
 }
 
@@ -8370,9 +8368,31 @@ section[id] {
   background: var(--bg);
 }
 
+/* Elevated White Article Reading Card Container */
+.article-reading-card,
 .article-reading-container {
-  max-width: 860px;
+  max-width: 940px;
   margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 40px rgba(4, 29, 86, 0.06);
+  padding: 3.5rem 4rem;
+}
+
+[data-theme="dark"] .article-reading-card,
+[data-theme="dark"] .article-reading-container {
+  background: var(--card);
+  border-color: var(--line);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 991px) {
+  .article-reading-card,
+  .article-reading-container {
+    padding: 2.5rem 2.25rem;
+    border-radius: 14px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -8381,6 +8401,19 @@ section[id] {
   }
   .article-detail-main {
     padding: 2rem 0 4rem;
+  }
+  .article-reading-card,
+  .article-reading-container {
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .article-reading-card,
+  .article-reading-container {
+    padding: 1.6rem 1.15rem;
+    border-radius: 10px;
   }
 }
 
@@ -8482,11 +8515,11 @@ section[id] {
 }
 
 .article-featured-hero-image {
-  margin: 0 auto 3rem;
-  border-radius: var(--radius);
+  margin: 0 auto 2.5rem;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(4, 29, 86, 0.06);
-  border: 1px solid rgba(4, 29, 86, 0.06);
+  box-shadow: 0 6px 25px rgba(4, 29, 86, 0.06);
+  border: 1px solid rgba(4, 29, 86, 0.08);
   max-height: 540px;
   background: #ffffff;
 }
@@ -8515,8 +8548,8 @@ section[id] {
 
 /* Article Dynamic Blocks Content Body */
 .article-content-body {
-  max-width: 860px;
-  margin: 0 auto 3rem;
+  max-width: 100%;
+  margin: 0 auto 2rem;
   font-size: 1.125rem;
   line-height: 1.88;
   color: #2D3748;

@@ -189,7 +189,7 @@ export default async function ArticleDetailPage({ params, searchParams }: Articl
 
       <main className="article-detail-main">
         <div className="container">
-          <div className="article-reading-container">
+          <div className="article-reading-card">
             {article.featuredImage?.url && (
               <div className="article-featured-hero-image">
                 <img
