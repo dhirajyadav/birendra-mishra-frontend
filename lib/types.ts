@@ -196,9 +196,6 @@ export interface MeetBirendraSectionData {
   metricHighlightText?: string;
   tagBadges?: TagBadge[];
   bio?: string;
-  bioParagraph1?: string;
-  bioParagraph2?: string;
-  bioParagraph3?: string;
   capabilitiesHeading?: string;
   capabilitiesLead?: string;
   capabilityValueCards?: CapabilityValueCard[];

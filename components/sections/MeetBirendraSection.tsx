@@ -37,44 +37,6 @@ function renderInlineRich(content?: string | null): { __html: string } {
 }
 
 /**
- * Renders a bio narrative paragraph with HTML/formatting support.
- */
-function renderBioParagraphItem(text?: string | null) {
-  if (!text) return null;
-  const raw = text.trim();
-  if (!raw) return null;
-
-  const cleaned = cleanMeetRichText(raw);
-
-  // If text contains HTML tags
-  if (/<[a-z][\s\S]*>/i.test(cleaned)) {
-    // If it has multiple <p> tags, render as div containing those paragraphs
-    if ((cleaned.match(/<p[^>]*>/gi) || []).length > 1) {
-      return <div className="profile-bio-multiblock" dangerouslySetInnerHTML={{ __html: cleaned }} />;
-    }
-    // Single <p> or inline html
-    const inner = cleaned.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
-    return <p dangerouslySetInnerHTML={{ __html: inner }} />;
-  }
-
-  // If text has newlines (\n\n), split into multiple <p>
-  if (cleaned.includes('\n')) {
-    const parts = cleaned.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-    if (parts.length > 1) {
-      return (
-        <>
-          {parts.map((part, idx) => (
-            <p key={idx}>{part}</p>
-          ))}
-        </>
-      );
-    }
-  }
-
-  return <p>{cleaned}</p>;
-}
-
-/**
  * Renders single unified bio narrative editor content.
  */
 function renderUnifiedBio(content?: string | null) {
@@ -124,17 +86,9 @@ export default function MeetBirendraSection({ data }: MeetBirendraProps) {
   const subheadline =
     data?.subheadline || 'Global Financial Strategy, M&A and Capital Governance';
 
-  const p1 =
-    data?.bioParagraph1 ||
-    'Over more than two decades in international finance and the energy sector, I have built experience across corporate headquarters and complex international operations, with assignments spanning India, Nigeria, Italy, Kenya, South Africa and Iraq.';
-
-  const p2 =
-    data?.bioParagraph2 ||
-    'My career has encompassed financial leadership, corporate reporting, planning and performance management, joint ventures, governance, capital allocation and transaction support across international upstream oil & gas operations.';
-
-  const p3 =
-    data?.bioParagraph3 ||
-    'Working across different countries, cultures and organisational settings has taught me to connect corporate strategy with operational realities while maintaining financial discipline and effective governance. Today, that experience shapes how I approach M&A, capital allocation, financial strategy, risk and controls, technology-enabled finance and enterprise performance.';
+  const defaultBio =
+    '<p>Over more than two decades in international finance and the energy sector, I have built experience across corporate headquarters and complex international operations, with assignments spanning India, Nigeria, Italy, Kenya, South Africa and Iraq.</p><p>My career has encompassed financial leadership, corporate reporting, planning and performance management, joint ventures, governance, capital allocation and transaction support across international upstream oil & gas operations.</p><p>Working across different countries, cultures and organisational settings has taught me to connect corporate strategy with operational realities while maintaining financial discipline and effective governance. Today, that experience shapes how I approach M&A, capital allocation, financial strategy, risk and controls, technology-enabled finance and enterprise performance.</p>';
+  const bioContent = data?.bio || defaultBio;
 
   const capabilitiesHeading =
     data?.capabilitiesHeading || 'Strategic Capabilities & Value to Organisation';
@@ -309,15 +263,7 @@ export default function MeetBirendraSection({ data }: MeetBirendraProps) {
 
           {/* Executive Background Narrative */}
           <div className="profile-bio-narrative">
-            {data?.bio ? (
-              renderUnifiedBio(data.bio)
-            ) : (
-              <>
-                {renderBioParagraphItem(p1)}
-                {renderBioParagraphItem(p2)}
-                {renderBioParagraphItem(p3)}
-              </>
-            )}
+            {renderUnifiedBio(bioContent)}
           </div>
 
           {/* Strategic Capabilities & Value to Organisation */}
