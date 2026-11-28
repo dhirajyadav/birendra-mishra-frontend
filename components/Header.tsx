@@ -12,6 +12,7 @@ export default function Header({ settings }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [capOpen, setCapOpen] = useState(false);
+  const [tempClosed, setTempClosed] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
   const toggleTheme = () => {
@@ -57,6 +58,10 @@ export default function Header({ settings }: HeaderProps) {
     setAboutOpen(false);
     setCapOpen(false);
     setMobileOpen(false);
+    setTempClosed(true);
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   const linkedIn = settings?.linkedInUrl || 'https://www.linkedin.com/';
@@ -78,8 +83,15 @@ export default function Header({ settings }: HeaderProps) {
         >
           {/* 1. About (Dropdown) */}
           <div
-            className={`nav-item nav-dropdown ${aboutOpen ? 'is-open' : ''}`}
+            className={`nav-item nav-dropdown ${aboutOpen ? 'is-open' : ''} ${tempClosed ? 'is-temp-closed' : ''}`}
             id="nav-dropdown-about"
+            onMouseLeave={() => {
+              setAboutOpen(false);
+              setTempClosed(false);
+              if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+              }
+            }}
           >
             <button
               type="button"
@@ -88,6 +100,7 @@ export default function Header({ settings }: HeaderProps) {
               aria-haspopup="true"
               onClick={(e) => {
                 e.stopPropagation();
+                setTempClosed(false);
                 setAboutOpen(!aboutOpen);
                 setCapOpen(false);
               }}
@@ -126,8 +139,15 @@ export default function Header({ settings }: HeaderProps) {
 
           {/* 2. Capabilities (Dropdown) */}
           <div
-            className={`nav-item nav-dropdown ${capOpen ? 'is-open' : ''}`}
+            className={`nav-item nav-dropdown ${capOpen ? 'is-open' : ''} ${tempClosed ? 'is-temp-closed' : ''}`}
             id="nav-dropdown-capabilities"
+            onMouseLeave={() => {
+              setCapOpen(false);
+              setTempClosed(false);
+              if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+              }
+            }}
           >
             <button
               type="button"
@@ -136,6 +156,7 @@ export default function Header({ settings }: HeaderProps) {
               aria-haspopup="true"
               onClick={(e) => {
                 e.stopPropagation();
+                setTempClosed(false);
                 setCapOpen(!capOpen);
                 setAboutOpen(false);
               }}
