@@ -74,6 +74,32 @@ function renderBioParagraphItem(text?: string | null) {
   return <p>{cleaned}</p>;
 }
 
+/**
+ * Renders single unified bio narrative editor content.
+ */
+function renderUnifiedBio(content?: string | null) {
+  if (!content) return null;
+  const raw = content.trim();
+  if (!raw) return null;
+
+  const cleaned = cleanMeetRichText(raw);
+
+  // If text contains HTML tags (e.g. from CKEditor)
+  if (/<[a-z][\s\S]*>/i.test(cleaned)) {
+    return <div className="profile-bio-html-body" dangerouslySetInnerHTML={{ __html: cleaned }} />;
+  }
+
+  // If plain text with newlines
+  const paragraphs = cleaned.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  return (
+    <div className="profile-bio-html-body">
+      {paragraphs.map((para, idx) => (
+        <p key={idx}>{para}</p>
+      ))}
+    </div>
+  );
+}
+
 export default function MeetBirendraSection({ data }: MeetBirendraProps) {
   const photoUrl = data?.photo?.url
     ? getStrapiMediaUrl(data.photo.url)
@@ -283,9 +309,15 @@ export default function MeetBirendraSection({ data }: MeetBirendraProps) {
 
           {/* Executive Background Narrative */}
           <div className="profile-bio-narrative">
-            {renderBioParagraphItem(p1)}
-            {renderBioParagraphItem(p2)}
-            {renderBioParagraphItem(p3)}
+            {data?.bio ? (
+              renderUnifiedBio(data.bio)
+            ) : (
+              <>
+                {renderBioParagraphItem(p1)}
+                {renderBioParagraphItem(p2)}
+                {renderBioParagraphItem(p3)}
+              </>
+            )}
           </div>
 
           {/* Strategic Capabilities & Value to Organisation */}
